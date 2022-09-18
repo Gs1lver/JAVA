@@ -7,6 +7,7 @@ package control;
 import java.sql.SQLException;
 import model.Jogos;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import model.DAO.JogosDAO;
 
 /**
@@ -18,15 +19,15 @@ public class JogosControl {
      private static JogosControl inst;
      private JogosDAO jdao = new JogosDAO();
     
-    private JogosControl(){
-        lstJogos = new ArrayList<Jogos>();
+    private JogosControl() throws SQLException{
+        lstJogos = jdao.buscarJogo();
     } 
     
     public ArrayList<Jogos> getList(){
         return lstJogos;
     }
     
-    public static JogosControl getInstance() {
+    public static JogosControl getInstance() throws SQLException {
         if (inst == null) {
             inst = new JogosControl();
         }
@@ -39,15 +40,30 @@ public class JogosControl {
         jdao.cadastrarJogo(j);
     }
     
-    public Jogos removerJogo(String nome, String empresa) throws SQLException{
-        for (Jogos j : lstJogos) {
-            if (j.getNome().equals(nome) && j.getEmpresa().equals(empresa) )
-                lstJogos.remove(j);
-        }
-        jdao.excluirJogo(nome, empresa);
-        return null;
+    public ArrayList<Jogos> arrayNew(String nome){
+        ArrayList<Jogos> arrayNovo = new ArrayList<>();
+        for(Jogos j: lstJogos){
+            if(j.getNome().toLowerCase().startsWith(nome.toLowerCase()))
+                arrayNovo.add(j);     
+        } 
+        if (arrayNovo.size() == 0) // ou isEmpty()
+            throw new IllegalArgumentException("Nenhum jogo encontrado"); 
+        return arrayNovo;
     }
     
-    
+     public Jogos pesquisa(String nome){
+        for(Jogos j: lstJogos){
+            if(j.getNome().toLowerCase().startsWith(nome.toLowerCase()))
+                return j;     
+        } 
+        throw new IllegalArgumentException("Jogo não encontrado");     
+    }
+     
+    public Jogos removerJogo(String nome) throws SQLException{
+        Jogos j = pesquisa(nome);
+        lstJogos.remove(j);
+        jdao.removerJogo(j);
+        return null;
+    }
     
 }

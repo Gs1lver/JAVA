@@ -4,11 +4,13 @@
  */
 package model.DAO;
 
+import java.sql.ResultSet;
 import model.Jogos;
 import conexao.Conexao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  *
@@ -31,12 +33,47 @@ public class JogosDAO {
         
     }
     
-    public void excluirJogo(String nome, String empresa) throws SQLException {
+    public void removerJogo(String nome) throws SQLException {
         con = (Connection) new Conexao().getConnection();
-        String sql = "DELETE FROM JogosJava WHERE Nome=? AND Empresa=?";
+        String sql = "DELETE FROM JogosJava WHERE Nome=? limit 1";
         PreparedStatement stmt = con.prepareStatement(sql);
         stmt.setString(1, nome);
-        stmt.setString(2, empresa);
+        stmt.execute();
+        stmt.close();
+        con.close();
+    }
+    
+    public void removerJogo(Jogos j) throws SQLException{
+        removerJogo(j.getNome());
+    }
+    
+    public ArrayList<Jogos> buscarJogo() throws SQLException{
+        con = (Connection) new Conexao().getConnection();
+        String sql = "SELECT * FROM JogosJava";
+        PreparedStatement stmt = con.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+        
+        ArrayList<Jogos> juegos = new ArrayList<>();
+        while(rs.next()){
+            String nome = rs.getString("Nome");
+            String estilo = rs.getString("Estilo"); 
+            float preco = rs.getFloat("Preço");
+            String empresa = rs.getString("Empresa");
+            
+            Jogos j = new Jogos(nome, estilo, preco, empresa);
+            juegos.add(j);
+        }
+            return juegos;
+    }
+    
+    public void buscarJogo(Jogos j)throws SQLException{
+        con = (Connection) new Conexao().getConnection();
+        String sql = "SELECT * FROM JogosJava WHERE Nome=?";
+        PreparedStatement stmt = con.prepareStatement(sql);
+        stmt.setString(1, j.getNome());
+        stmt.setString(2, j.getEmpresa());
+        stmt.setFloat(3, j.getPreco());
+        stmt.setString(4, j.getEstilo());
         stmt.execute();
         stmt.close();
         con.close();

@@ -16,8 +16,8 @@ import java.sql.SQLException;
 public class Conexao {
      public Connection getConnection() {    
        String url = "jdbc:mysql://143.106.241.3:3306/cl201289";
-       String usuario = "";
-       String senha = "";
+       String usuario = "cl201289";
+       String senha = "cl*11102005";
         try {  
             return DriverManager.getConnection(url, usuario, senha);
         } catch (SQLException ex) {
